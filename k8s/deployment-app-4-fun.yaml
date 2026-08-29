@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-4-fun-deployment
+  namespace: space-01
+  labels:
+    app: app-4-fun
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: app-4-fun
+  template:
+    metadata:
+      labels:
+        app: app-4-fun
+    spec:
+      containers:
+      - name: app-4-fun-container
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "250m"
+            memory: "128Mi"
