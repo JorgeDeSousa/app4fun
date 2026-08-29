@@ -1,0 +1,33 @@
+name: Deploy App-4-Fun to CCE
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'k8s/**'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Configure Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Deploy All Manifests
+        run: kubectl apply -f k8s/
+
+      - name: Verify Deployment
+        run: |
+          # Importante: Aquí verificamos el nombre exacto del nuevo deployment
+          kubectl rollout status deployment/app-4-fun-deployment -n space-01 --timeout=60s
