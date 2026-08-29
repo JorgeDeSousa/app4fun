@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-4-fun-ingress          # <--- Nombre único para este Ingress
+  namespace: space-01
+  annotations:
+    kubernetes.io/elb.id: "18b05cfd-a46c-48a0-879e-fbd342b99bbf"  # <--- Pega el ID del balanceador original
+    kubernetes.io/elb.port: "443"
+spec:
+  ingressClassName: cce
+  tls:
+  - hosts:
+    - k8s.grupogoit.cloud          # <--- Mismo dominio
+    secretName: cert-grupogoit     # <--- Mismo certificado SSL que ya está en space-01
+  rules:
+  - host: k8s.grupogoit.cloud
+    http:
+      paths:
+      - path: /app4fun             # <--- La sub-ruta exclusiva para esta app
+        pathType: Prefix
+        backend:
+          service:
+            name: app-4-fun-service
+            port:
+              number: 80
